@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+
+</head>
+<body>
+
+
+
+    <h1>Jquery Test</h1>
+
+    <button id="btnTest">Press Me</button>
+
+    <div id="box">
+
+    </div>
+
+    <!-- 
+        Create a drop down
+        Populate it with each of the team members names
+        Add the "change" event so that you can do something when the user changes the selection
+
+        Have a table that has one row for each property (id, name, email, active)
+
+        Populate the table with the selected team member's details
+            Figure out which team member was selected ()
+            Search the array for the name
+
+            put the id, name, email and active into the table
+
+
+    -->
+
+
+    <select id="selMember">
+    </select>
+
+    <style>
+        #tblMemberDetail tbody tr:nth-child(2) td:nth-child(2) {
+            background-color: lightgreen;
+        }
+    </style>
+
+
+    <table id="tblMemberDetail">
+        <tbody>
+            <tr>
+                <td>Id</td><td id="tdId">1</td>
+            </tr>
+            <tr>
+                <td>Name</td><td id="tdName">1</td>
+            </tr>
+            <tr>
+                <td>Email</td><td id="tdEmail">1</td>
+            </tr>
+            <tr>
+                <td>Active</td><td id="tdActive">1</td>
+            </tr>
+    
+        </tbody>
+    </table>
+
+    <table id="tblTeam">
+        <thead>
+            <tr>
+                <th>Id</th><th>Name</th><th>Email</th><th>Active</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+ 
+        function showUser(user) {
+            $('#tdId').html(user.id);
+            $('#tdName').html(user.name);
+            $('#tdEmail').html(user.email);
+            $('#tdActive').html(user.active ? "Active" : "Inactive");
+        }
+
+        var team = [
+            { "id":1, "name":"Alice", email:"alice@gmail.com", active:true }, 
+            { "id":2, "name":"Bob", email:"bob@gmail.com", active:false }, 
+            { "id":3, "name":"Carol", email:"carol@gmail.com", active:true }, 
+            { "id":4, "name":"Dan", email:"dan@gmail.com", active:true }, 
+            { "id":5, "name":"Eve", email:"eve@gmail.com", active:true }, 
+            { "id":6, "name":"Carol", email:"othercarol@gmail.com", active:false }, 
+
+        ];
+
+        // show the first user
+        showUser(team[0]);
+
+        // populate the drop down
+        for (var i=0;  i<team.length; i++) {
+            $('#selMember').append(`<option value="${team[i].id}">${team[i].name}</option>`);
+        }
+
+        $('#selMember').on("change", function() {
+
+            var selectedId = $('#selMember').val();
+
+            // find the team member from the array
+            for (var i=0; i<team.length; i++) {
+
+                if (team[i].id == selectedId) {
+                    // found the item in the array
+                    showUser(team[i]);
+                }
+            }
+        });
+
+
+
+
+        for (var i=0; i<team.length; i++) {
+
+            $('#tblTeam tbody').append(`<tr>
+                    <td>${team[i].id}</td>
+                    <td>${team[i].name}</td>
+                    <td>${team[i].email}</td>
+                    <td>${team[i].active}</td>
+                </tr>`);
+        }
+        
+         // $(sector).somecommand ();
+ 
+         $('#btnTest').on("click", function() {
+             // alert("is this working?");
+
+             $('#box').append("<h1>Hello</h1>");
+         });
+ 
+ 
+     </script>    
+     
+     
+</body>
+</html>

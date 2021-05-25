@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Team</h1>
+
+    <table id="tblTeam">
+        <thead>
+            <tr>
+                <td>Id</td>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Active</th>
+                <th>Controls</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+    <hr>
+
+    <div id="dlgUser">
+        Name: <input id="txtName"><br>
+        Email: <input id="txtEmail"><br>
+        Active: <input type="checkbox" id="chkActive"><br>
+
+        <button id="btnSave">Add</button>
+        <button id="btnCancel">Cancel</button>
+    </div>
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+
+        function addUserToTable(user) {
+            
+            $('#tblTeam tbody').append(`<tr id="tr_${user.id}">
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>
+                            <input type="checkbox" id="chkActive_${user.id}" ${user.active ? "checked" : ""} DISABLED>
+                        </td>
+                        <td>
+                            <button id="del_${user.id}" class="btn_delete">X</button>
+                            <button id="edit_${user.id}" class="btn_edit">Edit</button>
+                            <button id="save_${user.id}" class="btn_save">Save</button>
+                            <button id="cancel_${user.id}" class="btn_cancel">Cancel</button>
+                        </td>
+                    </tr>`);
+            
+        }
+
+        function getIdFromEvent(evt) {
+            var pieces = evt.currentTarget.id.split("_");
+            var id = pieces[1];    
+            return id;        
+        }
+
+        var url = "http://localhost:3000/team";
+
+        $.getJSON(url, function(team) { 
+            for (var i=0; i<team.length; i++) {
+                addUserToTable(team[i]);
+            }
+        });
+
+        // add click event handler to .btn_delete even for 
+        // objects that don't exist yet!
+        $(document).on("click", '.btn_delete', function(evt) {
+            var id = getIdFromEvent(evt);
+
+            if (confirm(`Delete user ${id}. Are you sure?`)) {
+                $.ajax({
+                    method: "DELETE", 
+                    url: `${url}/${id}`, 
+                    success: function() {
+                        $(`#tr_${id}`).remove();
+                    }, 
+                    error: function(error) {
+                        alert("error");
+                    }
+                });
+
+            }
+        });        
+
+        $(document).on("click", ".btn_edit", function(evt) {
+            var id = getIdFromEvent(evt);
+
+            var name = $(`#tr_${id} td:nth-child(2)`).html();
+            $(`#tr_${id} td:nth-child(2)`).html(`<input  id="txtName_${id}" value="${name}">`);
+
+            var email = $(`#tr_${id} td:nth-child(3)`).html();
+            $(`#tr_${id} td:nth-child(3)`).html(`<input  id="txtEmail_${id}" value="${email}">`);
+
+            $(`#chkActive_${id}`).attr("DISABLED", false);
+
+        });
+
+        $(document).on("click", ".btn_save", function(evt) {
+            var id = getIdFromEvent(evt);
+
+            // read the values from the controls
+            var updatedName = $(`#txtName_${id}`).val();
+            var updatedEmail = $(`#txtEmail_${id}`).val();
+            var updatedActive = $(`#chkActive_${id}`).prop("checked");
+
+            var updatedUser = {
+                name: updatedName, 
+                email: updatedEmail, 
+                active: updatedActive
+            }
+
+            console.log(updatedUser);
+
+            // write the update using an ajax call
+
+            $.ajax({
+                method: "PUT", 
+                url: `${url}/${id}`, 
+                contentType: "application/json", 
+                data: JSON.stringify(updatedUser), 
+                success: function(user) {
+                    // remove the text controls and replace them with just the text
+                    $(`#tr_${id} td:nth-child(2)`).html(user.name);
+                    $(`#tr_${id} td:nth-child(3)`).html(user.email);
+                    $(`#chkActive_${id}`).attr("DISABLED", true);
+                }, 
+                error: function(error) {
+                    alert("error");
+                }
+            });
+        });
+
+
+        $('#btnSave').on("click", function() {
+
+            var name = $('#txtName').val();
+            var email = $('#txtEmail').val();
+            var active = $('#chkActive').prop('checked');
+
+            var newUser = {
+                name: name, 
+                email: email, 
+                active: active
+            }
+
+            console.log(newUser);
+
+            // write new user to REST webservice using POST request
+            $.ajax({
+                method: "POST", 
+                url: url, 
+                contentType: "application/json",
+                data: JSON.stringify(newUser), 
+
+                success: function(user) {
+                    addUserToTable(user);
+                }, 
+
+                error: function(error) {
+                    alert("error");
+                }
+
+            });
+
+
+        });
+
+        $('#btnCancel').on("click", function() {
+            alert("cancel");
+        });
+
+    </script>
+</body>
+</html>
