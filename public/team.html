@@ -35,6 +35,22 @@
         <button id="btnCancel">Cancel</button>
     </div>
 
+    <hr>
+
+    <table id="tblTransactions">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>UserId</th>
+                <th>Description</th>
+                <th>Date</th>
+            </tr>
+
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
 
 
 
@@ -42,9 +58,15 @@
 
     <script>
 
+        var originalValues = {
+            name:"", 
+            email:"", 
+            active: false
+        };
+        
         function addUserToTable(user) {
             
-            $('#tblTeam tbody').append(`<tr id="tr_${user.id}">
+            $('#tblTeam tbody').append(`<tr id="tr_${user.id}" class="tr_users">
                         <td>${user.id}</td>
                         <td>${user.name}</td>
                         <td>${user.email}</td>
@@ -54,20 +76,38 @@
                         <td>
                             <button id="del_${user.id}" class="btn_delete">X</button>
                             <button id="edit_${user.id}" class="btn_edit">Edit</button>
-                            <button id="save_${user.id}" class="btn_save">Save</button>
-                            <button id="cancel_${user.id}" class="btn_cancel">Cancel</button>
+                            <button id="save_${user.id}" class="btn_save" DISABLED>Save</button>
+                            <button id="cancel_${user.id}" class="btn_cancel" DISABLED>Cancel</button>
                         </td>
                     </tr>`);
             
         }
 
+        function addTransactionToTable(transaction) {
+            
+            $('#tblTransactions tbody').append(`<tr id="trTransaction_${transaction.id}" class="tr_transactions">
+                        <td>${transaction.id}</td>
+                        <td>${transaction.userId}</td>
+                        <td>${transaction.description}</td>
+                        <td>${transaction.date}</td>
+                        <td>
+                            <button id="txdel_${transaction.id}" class="btn_txdelete">X</button>
+                            <button id="txedit_${transaction.id}" class="btn_txedit">Edit</button>
+                            <button id="txsave_${transaction.id}" class="btn_txsave" DISABLED>Save</button>
+                            <button id="txcancel_${transaction.id}" class="btn_txcancel" DISABLED>Cancel</button>
+                        </td>
+                    </tr>`);
+            
+        }
         function getIdFromEvent(evt) {
             var pieces = evt.currentTarget.id.split("_");
             var id = pieces[1];    
             return id;        
         }
 
-        var url = "http://localhost:3000/team";
+        var baseUrl = "http://localhost:3000/";
+        var url = `${baseUrl}team`;
+        var transactionUrl = `${baseUrl}transactions`;
 
         $.getJSON(url, function(team) { 
             for (var i=0; i<team.length; i++) {
@@ -99,15 +139,49 @@
             var id = getIdFromEvent(evt);
 
             var name = $(`#tr_${id} td:nth-child(2)`).html();
-            $(`#tr_${id} td:nth-child(2)`).html(`<input  id="txtName_${id}" value="${name}">`);
+            $(`#tr_${id} td:nth-child(2)`).html(`<input  id="txtName_${id}" value="${name}" data-original-value="${name}">`);
 
             var email = $(`#tr_${id} td:nth-child(3)`).html();
-            $(`#tr_${id} td:nth-child(3)`).html(`<input  id="txtEmail_${id}" value="${email}">`);
+            $(`#tr_${id} td:nth-child(3)`).html(`<input  id="txtEmail_${id}" value="${email}" data-original-value="${email}">`);
 
+            var checked = $(`#chkActive_${id}`).prop("checked");
+
+            $(`#chkActive_${id}`).attr("data-original-value", checked);
             $(`#chkActive_${id}`).attr("DISABLED", false);
+
+            // store the original values
+            originalValues.name = name;
+            originalValues.email = email;
+            originalValues.active = $(`#chkActive_${id}`).prop("checked");
+
+            $(`#save_${id}`).attr("DISABLED", false);
+            $(`#edit_${id}`).attr("DISABLED", true);
+            $(`#cancel_${id}`).attr("DISABLED", false);
+
 
         });
 
+
+        $(document).on("click", ".btn_cancel", function(evt) {
+            var id = getIdFromEvent(evt);
+
+            // read the original values from the controls
+            var originalName = $(`#txtName_${id}`).attr("data-original-value");
+            var originalEmail = $(`#txtEmail_${id}`).attr("data-original-value");
+            var originalActive = $(`#chkActive_${id}`).attr("data-original-value") == "true";
+
+            $(`#tr_${id} td:nth-child(2)`).html(originalName);
+
+            $(`#tr_${id} td:nth-child(3)`).html(originalEmail);
+            $(`#chkActive_${id}`).prop("checked", originalActive);
+
+            $(`#chkActive_${id}`).attr("DISABLED", true);
+            $(`#save_${id}`).attr("DISABLED", true);
+            $(`#edit_${id}`).attr("DISABLED", false);    
+            $(`#cancel_${id}`).attr("DISABLED", true);   
+
+
+        })
         $(document).on("click", ".btn_save", function(evt) {
             var id = getIdFromEvent(evt);
 
@@ -136,11 +210,31 @@
                     $(`#tr_${id} td:nth-child(2)`).html(user.name);
                     $(`#tr_${id} td:nth-child(3)`).html(user.email);
                     $(`#chkActive_${id}`).attr("DISABLED", true);
+                    $(`#save_${id}`).attr("DISABLED", true);
+                    $(`#edit_${id}`).attr("DISABLED", false);    
+                    $(`#cancel_${id}`).attr("DISABLED", true);                
                 }, 
                 error: function(error) {
                     alert("error");
                 }
             });
+        });
+
+        $(document).on('click', '.tr_users', function(evt) {
+            var userId = getIdFromEvent(evt);
+
+            // clear the existing transactions
+            $('#tblTransactions tbody').empty();
+            // get the transactions for userId
+            $.getJSON(`${transactionUrl}?userId=${userId}`, function(transactions) {
+
+                for (var i=0; i<transactions.length; i++) {
+                    addTransactionToTable(transactions[i]);
+                }
+            });
+
+            
+
         });
 
 

@@ -1,16 +1,22 @@
 {
+  "transactions": [
+    {"id":1, "userId":4, "description": "tx 1 for Alice", "date":"2021-05-25"}, 
+    {"id":2, "userId":4, "description": "tx 2 for Alice", "date":"2021-04-21"}, 
+    {"id":3, "userId":4, "description": "tx 3 for Alice", "date":"2021-02-25"}, 
+    {"id":4, "userId":5, "description": "tx 1 for Eve", "date":"2021-05-25"}, 
+    {"id":5, "userId":6, "description": "tx 1 for User 6", "date":"2021-05-25"}, 
+    {"id":6, "userId":7, "description": "tx 1 for Aidan", "date":"2021-04-02"}, 
+    {"id":7, "userId":6, "description": "tx 2 for User 6", "date":"2021-01-25"}, 
+    {"id":8, "userId":5, "description": "tx 2 for Eve", "date":"2021-02-25"}, 
+    {"id":9, "userId":4, "description": "tx 4 for Alice", "date":"2021-01-25"} 
+
+  ], 
   "team": [
     {
-      "id": 3,
-      "name": "Carol",
-      "email": "carol@gmail.com",
-      "active": false
-    },
-    {
-      "id": 4,
-      "name": "Dan",
-      "email": "dan@gmail.com",
-      "active": true
+      "name": "Alice",
+      "email": "alice@gmail.com",
+      "active": false,
+      "id": 4
     },
     {
       "id": 5,
@@ -25,15 +31,15 @@
       "active": true
     },
     {
-      "name": "Aidan",
+      "name": "Aidansssss",
       "email": "aidan.killeen@gmail.com",
-      "active": "false",
+      "active": true,
       "id": 7
     },
     {
       "name": "Fred",
       "email": "Fred@gmail.com",
-      "active": "false",
+      "active": true,
       "id": 8
     },
     {
